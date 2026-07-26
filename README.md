@@ -1,73 +1,131 @@
 # 🎵 SonicEnhance Pro
 
-> Professional MP3 enhancement tool optimized for wired earphones — built entirely in the browser using Web Audio API.
+**Professional Audio Enhancement for Wired Earphones (Android App)**
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+SonicEnhance Pro is a high-performance audio enhancement application designed to improve clarity, bass balance, and spatial depth — optimized specifically for **wired earphones**.
+
+---
+
+## 📥 Download (Recommended)
+
+👉 Install the latest Android APK from Releases:
+
+➡️ **Go to → Releases → Download APK**
+
+*(Direct installation, no setup required)*
+
+---
+
+## 🚀 Overview
+
+SonicEnhance Pro is built as a **closed Android application** with a custom audio processing pipeline.
+
+This repository only contains:
+
+* 🌐 A **lightweight web demo (`index.html`)**
+* 📄 Project documentation
+
+The full app logic is compiled into the APK for performance and protection.
+
+---
 
 ## ✨ Features
 
-- **🎚️ Real-time Audio Processing** — 3-band EQ with low/mid/high shelf filters
-- **🎧 Earphone Optimization** — Custom-tuned presets for wired earphones with medium bass
-- **🔊 Enhancement Modes** — Bass boost, vocal clarity, spatial audio, and maximum clarity
-- **📊 Visualizer** — Real-time frequency spectrum visualization
-- **⏯️ Full Playback Controls** — Play, pause, seek, skip ±10s, loop
-- **📁 Drag & Drop** — Instant MP3/WAV upload with file info display
-- **🔊 Volume Boost** — Up to 200% volume gain
-- **⚡ Zero Backend** — 100% client-side processing, no server required
+### 🎚️ Audio Enhancement
 
-## 🚀 Quick Start
+* Real-time DSP processing
+* 3-band EQ (Low / Mid / High)
+* Volume boost up to 200%
 
-1. Clone or download this repository
-2. Open `index.html` in any modern browser
-3. Drop your MP3 file or click to upload
-4. Enjoy enhanced audio instantly!
+### 🎧 Earphone Optimization
 
+* Tuned for wired earphones (medium bass profile)
+* Distortion-controlled bass enhancement
+* Clear vocal separation
 
-```bash
-git clone https://github.com/Periyannan35/sonicenhance-pro.git
-cd sonicenhance-pro
-# Open index.html in your browser
+### 🔊 Enhancement Modes
+
+* Bass Boost
+* Vocal Clarity
+* Spatial Audio
+* Maximum Clarity
+
+### ⏯️ Playback Controls
+
+* Play / Pause
+* Seek timeline
+* ±10s skip
+* Loop playback
+
+---
+
+## 🌐 Web Demo (Testing Only)
+
+You can test the core concept in browser:
+
+```id="demo"
+index.html
 ```
+
+### Steps:
+
+1. Open in Chrome / Edge / Firefox
+2. Upload an MP3/WAV file
+3. Apply presets
+4. Observe real-time changes
+
+⚠️ Note:
+The web version is **limited** and intended only for demonstration.
+Full performance and processing are available in the Android app.
+
+---
 
 ## 🎛️ Presets
 
-| Preset | Description |
-|--------|-------------|
-| 🎧 **Wired Earphones** | Balanced boost optimized for medium bass earphones |
-| 🔊 **Bass Boost** | Deep low-end enhancement |
-| 🎤 **Vocal Clarity** | Mid-range focus for podcasts/vocals |
-| 📊 **Flat** | No processing, original audio |
+| Preset             | Description              |
+| ------------------ | ------------------------ |
+| 🎧 Wired Earphones | Balanced tuning          |
+| 🔊 Bass Boost      | Enhanced low frequencies |
+| 🎤 Vocal Clarity   | Focus on mid-range       |
+| 📊 Flat            | Original audio           |
 
-## 🛠️ Tech Stack
-
-- **Web Audio API** — Audio decoding, processing graph, real-time effects
-- **Canvas API** — Frequency visualization
-- **Vanilla JS** — No dependencies, lightweight
-- **CSS3** — Glassmorphism UI, responsive design
-
-## 📱 Browser Support
-
-| Chrome | Firefox | Safari | Edge |
-|--------|---------|--------|------|
-| ✅ 66+ | ✅ 60+ | ✅ 14.1+ | ✅ 79+ |
+---
 
 ## 🎯 Use Cases
 
-- Enhance old/low-quality MP3 files
-- Optimize audio for specific earphone models
-- Boost quiet recordings
-- Add spatial width to flat recordings
-- Quick audio preview with effects
+* Improve low-quality audio files
+* Optimize music for earphones
+* Enhance voice recordings
+* Add depth to flat audio
+
+---
 
 ## 🔒 Privacy
 
-All audio processing happens locally in your browser. **No files are uploaded to any server.**
+* No server communication
+* No data collection
+* Fully offline processing
+
+---
+
+## ⚠️ Important Notes
+
+* Source code for the Android app is **not publicly included**
+* APK is the official distribution method
+* Repository exists for:
+
+  * Demo access
+  * Documentation
+  * Updates tracking
+
+---
 
 ## 📄 License
 
-MIT License — feel free to use, modify, and distribute.
+MIT License (for web demo and documentation only)
+
 ---
 
-<p align="center">Built with 💜 for audiophiles</p>
+## 💜 Built For
+
+Users who want **instant audio enhancement without complex tools**
