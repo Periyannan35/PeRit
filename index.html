@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f0f1a">
+    <title>SonicEnhance Pro — MP3 Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <div>
+                <h1>🎵 SonicEnhance Pro</h1>
+                <p>Professional MP3 Enhancement for Wired Earphones</p>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="btnShortcuts" title="Keyboard Shortcuts (?)">⌨️</button>
+                <button class="icon-btn" id="btnFullscreen" title="Fullscreen Visualizer (F)">⛶</button>
+            </div>
+        </header>
+
+        <section class="visualizer-section" id="visualizerSection">
+            <canvas id="visualizer"></canvas>
+            <div class="visualizer-overlay">
+                <button class="icon-btn" id="btnVisMode" title="Change Mode">📊</button>
+            </div>
+            <div class="peak-meter">
+                <div class="peak-bar"><div class="peak-fill" id="peakLeft"></div></div>
+                <div class="peak-bar"><div class="peak-fill" id="peakRight"></div></div>
+            </div>
+        </section>
+
+        <section class="playback-section">
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"><div class="progress-handle"></div></div>
+                </div>
+                <div class="progress-tooltip" id="progressTooltip">0:00</div>
+            </div>
+            <div class="playback-controls">
+                <button class="control-btn" id="btnShuffle" title="Shuffle (S)">🔀</button>
+                <button class="control-btn" id="btnPrev" title="Previous (P)">⏮</button>
+                <button class="control-btn" id="btnStop" title="Stop">⏹</button>
+                <button class="control-btn primary active" id="btnPlay" title="Play/Pause (Space)">▶</button>
+                <button class="control-btn" id="btnNext" title="Next (N)">⏭</button>
+                <button class="control-btn" id="btnLoop" title="Loop Mode (L)">🔁</button>
+            </div>
+            <div class="secondary-controls">
+                <div class="slider-group">
+                    <label>Speed</label>
+                    <input type="range" id="speedSlider" min="50" max="200" value="100">
+                    <span id="speedValue">1.0x</span>
+                </div>
+                <div class="slider-group">
+                    <span>🔈</span>
+                    <input type="range" id="volumeSlider" min="0" max="200" value="100">
+                    <span id="volumeValue">100%</span>
+                </div>
+                <button class="control-btn ab-btn" id="btnAB" title="A/B Bypass (A)">A/B</button>
+            </div>
+        </section>
+
+        <div class="content-grid">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>🎚️ Audio Enhancement</h2>
+                    <span class="badge">Medium Bass Earphones</span>
+                </div>
+
+                <div class="eq-section">
+                    <h3>3-Band Equalizer</h3>
+                    <div class="eq-container">
+                        <div class="eq-band">
+                            <input type="range" class="eq-slider" id="eqLow" min="-20" max="20" value="6" orient="vertical">
+                            <span class="eq-value" id="valLow">+6dB</span>
+                            <span class="eq-label">100Hz</span>
+                        </div>
+                        <div class="eq-band">
+                            <input type="range" class="eq-slider" id="eqMid" min="-20" max="20" value="3" orient="vertical">
+                            <span class="eq-value" id="valMid">+3dB</span>
+                            <span class="eq-label">1kHz</span>
+                        </div>
+                        <div class="eq-band">
+                            <input type="range" class="eq-slider" id="eqHigh" min="-20" max="20" value="4" orient="vertical">
+                            <span class="eq-value" id="valHigh">+4dB</span>
+                            <span class="eq-label">10kHz</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toggles-section">
+                    <div class="toggle-row">
+                        <span>🔊 Maximum Clarity Boost</span>
+                        <label class="toggle-switch active" id="clarityToggle"><input type="checkbox" checked></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>🎧 Earphone Optimization</span>
+                        <label class="toggle-switch active" id="earphoneToggle"><input type="checkbox" checked></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>🥁 Bass Enhancement</span>
+                        <label class="toggle-switch active" id="bassToggle"><input type="checkbox" checked></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>✨ Spatial Audio</span>
+                        <label class="toggle-switch" id="spatialToggle"><input type="checkbox"></label>
+                    </div>
+                </div>
+
+                <div class="presets-section">
+                    <h3>Presets</h3>
+                    <div class="preset-buttons">
+                        <button class="preset-btn active" data-preset="earphone">🎧 Wired Earphones</button>
+                        <button class="preset-btn" data-preset="bass">🔊 Bass Boost</button>
+                        <button class="preset-btn" data-preset="vocal">🎤 Vocal Clarity</button>
+                        <button class="preset-btn" data-preset="flat">📊 Flat</button>
+                    </div>
+                </div>
+
+                <div class="advanced-section" id="advancedSection">
+                    <div class="advanced-header" id="advancedHeader">
+                        <h3>Advanced Processing</h3>
+                        <button>▼</button>
+                    </div>
+                    <div class="advanced-content" id="advancedContent">
+                        <div class="slider-row">
+                            <label>Reverb Mix</label>
+                            <input type="range" id="reverbMix" min="0" max="100" value="100">
+                            <span id="reverbMixVal">100%</span>
+                        </div>
+                        <div class="slider-row">
+                            <label>Stereo Width</label>
+                            <input type="range" id="stereoWidth" min="0" max="200" value="100">
+                            <span id="stereoWidthVal">100%</span>
+                        </div>
+                        <div class="toggle-row">
+                            <span>🎚️ Compressor</span>
+                            <label class="toggle-switch" id="compressorToggle"><input type="checkbox"></label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>🛡️ Limiter</span>
+                            <label class="toggle-switch" id="limiterToggle"><input type="checkbox"></label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>🔇 High-Pass Filter</span>
+                            <label class="toggle-switch" id="hpfToggle"><input type="checkbox"></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside>
+                <div class="upload-section" id="uploadSection">
+                    <div class="upload-icon">📁</div>
+                    <h3>Drop audio files here</h3>
+                    <p>MP3, WAV, OGG, FLAC supported</p>
+                    <button class="upload-btn" id="btnUpload">Choose Files</button>
+                    <input type="file" id="fileInput" accept="audio/*" multiple>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+
+                <div class="panel track-info" id="trackInfo" style="display:none">
+                    <h3>Track Information</h3>
+                    <div class="info-grid">
+                        <span>File</span><span id="infoName">—</span>
+                        <span>Size</span><span id="infoSize">—</span>
+                        <span>Duration</span><span id="infoDuration">—</span>
+                        <span>Sample Rate</span><span id="infoSampleRate">—</span>
+                        <span>Channels</span><span id="infoChannels">—</span>
+                        <span>Bitrate</span><span id="infoBitrate">—</span>
+                    </div>
+                </div>
+
+                <div class="panel playlist-section" id="playlistSection" style="display:none">
+                    <div class="playlist-header">
+                        <h3>Playlist</h3>
+                        <span class="playlist-count" id="playlistCount">0 tracks</span>
+                    </div>
+                    <ul class="playlist" id="playlist"></ul>
+                </div>
+
+                <div class="actions-section">
+                    <button class="action-btn primary" id="btnExport">💾 Export to WAV</button>
+                    <button class="action-btn" id="btnClear">🗑 Clear Playlist</button>
+                </div>
+            </aside>
+        </div>
+
+        <div class="status ready" id="status">Ready — Load an audio file to begin enhancement</div>
+    </div>
+
+    <div class="drop-overlay" id="dropOverlay">
+        <h2>📁 Drop Audio Files</h2>
+        <p>Release to add to playlist</p>
+    </div>
+
+    <div class="modal" id="shortcutsModal">
+        <div class="modal-content">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="shortcuts-list">
+                <kbd>Space</kbd><span>Play / Pause</span>
+                <kbd>←</kbd><span>Seek back 5s</span>
+                <kbd>→</kbd><span>Seek forward 5s</span>
+                <kbd>↑</kbd><span>Volume +10%</span>
+                <kbd>↓</kbd><span>Volume -10%</span>
+                <kbd>M</kbd><span>Mute / Unmute</kbd>
+                <kbd>A</kbd><span>A/B Bypass</span>
+                <kbd>F</kbd><span>Fullscreen Visualizer</span>
+                <kbd>1</kbd><span>Wired Earphones preset</span>
+                <kbd>2</kbd><span>Bass Boost preset</span>
+                <kbd>3</kbd><span>Vocal Clarity preset</span>
+                <kbd>4</kbd><span>Flat preset</span>
+                <kbd>L</kbd><span>Cycle Loop Mode</span>
+                <kbd>S</kbd><span>Toggle Shuffle</span>
+                <kbd>N</kbd><span>Next Track</span>
+                <kbd>P</kbd><span>Previous Track</span>
+                <kbd>Esc</kbd><span>Close / Exit Fullscreen</span>
+            </div>
+            <button class="close-modal" id="btnCloseShortcuts">Close</button>
+        </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h3>💾 Export Enhanced Audio</h3>
+            <p>Offline-render the current track with all active enhancements to a 16-bit WAV file.</p>
+            <div class="export-progress"><div class="export-bar" id="exportBar"></div></div>
+            <div class="export-status" id="exportStatus">Ready to export</div>
+            <div class="modal-actions">
+                <button class="action-btn primary" id="btnStartExport">Start Export</button>
+                <button class="close-modal" id="btnCloseExport">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="audio-engine.js"></script>
+    <script src="visualizer.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
