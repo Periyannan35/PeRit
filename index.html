@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f0f1a">
+    <title>SonicEnhance Pro — MP3 Optimizer</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: '#00f3ff',
+                        dark: '#050505',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        #bg-canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #visualizer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+
+<body>
+    <div id="bg-canvas-container"></div>
+    <div class="app">
+        <header class="app-header">
+            <div>
+                <h1>🎵 SonicEnhance Pro</h1>
+                <p>Professional MP3 Enhancement for Wired Earphones</p>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="btnThemeToggle" title="Toggle Theme">🌓</button>
+                <button class="icon-btn" id="btnShortcuts" title="Keyboard Shortcuts (?)">⌨️</button>
+                <button class="icon-btn" id="btnFullscreen" title="Fullscreen Visualizer (F)">⛶</button>
+            </div>
+        </header>
+
+        <section class="visualizer-section" id="visualizerSection">
+            <canvas id="visualizer"></canvas>
+            <div id="canvas-container"></div>
+
+            <div class="visualizer-overlay" id="pillNavOverlay">
+                <div class="pill-nav-container">
+                    <nav class="pill-nav" aria-label="Primary"
+                        style="--base: #000; --pill-bg: #120F17; --hover-text: #fff; --pill-text: #fff;">
+                        <div class="pill-logo">
+                            <span style="font-size: 20px; font-weight: bold; color: #00f3ff;">⚡</span>
+                        </div>
+                        <div class="pill-nav-items desktop-only" id="pillNavItems">
+                            <ul class="pill-list" role="menubar">
+                                <li role="none">
+                                    <button class="pill" data-mode="0">
+                                        <span class="hover-circle" aria-hidden="true"></span>
+                                        <span class="label-stack">
+                                            <span class="pill-label">Bars</span>
+                                            <span class="pill-label-hover" aria-hidden="true">Bars</span>
+                                        </span>
+                                    </button>
+                                </li>
+                                <li role="none">
+                                    <button class="pill" data-mode="1">
+                                        <span class="hover-circle" aria-hidden="true"></span>
+                                        <span class="label-stack">
+                                            <span class="pill-label">Wave</span>
+                                            <span class="pill-label-hover" aria-hidden="true">Wave</span>
+                                        </span>
+                                    </button>
+                                </li>
+                                <li role="none">
+                                    <button class="pill" data-mode="2">
+                                        <span class="hover-circle" aria-hidden="true"></span>
+                                        <span class="label-stack">
+                                            <span class="pill-label">Circle</span>
+                                            <span class="pill-label-hover" aria-hidden="true">Circle</span>
+                                        </span>
+                                    </button>
+                                </li>
+                                <li role="none">
+                                    <button class="pill" data-mode="3">
+                                        <span class="hover-circle" aria-hidden="true"></span>
+                                        <span class="label-stack">
+                                            <span class="pill-label">Liquid</span>
+                                            <span class="pill-label-hover" aria-hidden="true">Liquid</span>
+                                        </span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            <div class="peak-meter">
+                <div class="peak-bar">
+                    <div class="peak-fill" id="peakLeft"></div>
+                </div>
+                <div class="peak-bar">
+                    <div class="peak-fill" id="peakRight"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="playback-section">
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill">
+                        <div class="progress-handle"></div>
+                    </div>
+                </div>
+                <div class="progress-tooltip" id="progressTooltip">0:00</div>
+            </div>
+            <div class="playback-controls">
+                <button class="control-btn" id="btnShuffle" title="Shuffle (S)">🔀</button>
+                <button class="control-btn" id="btnPrev" title="Previous (P)">⏮</button>
+                <button class="control-btn" id="btnStop" title="Stop">⏹</button>
+                <button class="control-btn primary active" id="btnPlay" title="Play/Pause (Space)">▶</button>
+                <button class="control-btn" id="btnNext" title="Next (N)">⏭</button>
+                <button class="control-btn" id="btnLoop" title="Loop Mode (L)">🔁</button>
+            </div>
+            <div class="secondary-controls">
+                <div class="slider-group">
+                    <label>Speed</label>
+                    <input type="range" id="speedSlider" min="50" max="200" value="100">
+                    <span id="speedValue">1.0x</span>
+                </div>
+                <div class="slider-group">
+                    <span>🔈</span>
+                    <input type="range" id="volumeSlider" min="0" max="200" value="100">
+                    <span id="volumeValue">100%</span>
+                </div>
+                <button class="control-btn ab-btn" id="btnAB" title="A/B Bypass (A)">A/B</button>
+            </div>
+        </section>
+
+        <div class="content-grid">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>🎚️ Audio Enhancement</h2>
+                    <span class="badge">Medium Bass Earphones</span>
+                </div>
+
+                <div class="eq-section">
+                    <h3>3-Band Equalizer</h3>
+                    <div class="eq-container">
+                        <div class="eq-band">
+                            <input type="range" class="eq-slider" id="eqLow" min="-20" max="20" value="6"
+                                orient="vertical">
+                            <span class="eq-value" id="valLow">+6dB</span>
+                            <span class="eq-label">100Hz</span>
+                        </div>
+                        <div class="eq-band">
+                            <input type="range" class="eq-slider" id="eqMid" min="-20" max="20" value="3"
+                                orient="vertical">
+                            <span class="eq-value" id="valMid">+3dB</span>
+                            <span class="eq-label">1kHz</span>
+                        </div>
+                        <div class="eq-band">
+                            <input type="range" class="eq-slider" id="eqHigh" min="-20" max="20" value="4"
+                                orient="vertical">
+                            <span class="eq-value" id="valHigh">+4dB</span>
+                            <span class="eq-label">10kHz</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toggles-section">
+                    <div class="toggle-row">
+                        <span>🔊 Maximum Clarity Boost</span>
+                        <label class="toggle-switch active" id="clarityToggle"><input type="checkbox" checked></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>🎧 Earphone Optimization</span>
+                        <label class="toggle-switch active" id="earphoneToggle"><input type="checkbox" checked></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>🥁 Bass Enhancement</span>
+                        <label class="toggle-switch active" id="bassToggle"><input type="checkbox" checked></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>✨ Spatial Audio</span>
+                        <label class="toggle-switch" id="spatialToggle"><input type="checkbox"></label>
+                    </div>
+                </div>
+
+                <div class="presets-section">
+                    <h3>Presets</h3>
+                    <div class="preset-buttons">
+                        <button class="preset-btn active" data-preset="earphone">🎧 Wired Earphones</button>
+                        <button class="preset-btn" data-preset="bass">🔊 Bass Boost</button>
+                        <button class="preset-btn" data-preset="vocal">🎤 Vocal Clarity</button>
+                        <button class="preset-btn" data-preset="flat">📊 Flat</button>
+                    </div>
+                </div>
+
+                <div class="advanced-section" id="advancedSection">
+                    <div class="advanced-header" id="advancedHeader">
+                        <h3>Advanced Processing</h3>
+                        <button>▼</button>
+                    </div>
+                    <div class="advanced-content" id="advancedContent">
+                        <div class="slider-row">
+                            <label>Reverb Mix</label>
+                            <input type="range" id="reverbMix" min="0" max="100" value="100">
+                            <span id="reverbMixVal">100%</span>
+                        </div>
+                        <div class="slider-row">
+                            <label>Stereo Width</label>
+                            <input type="range" id="stereoWidth" min="0" max="200" value="100">
+                            <span id="stereoWidthVal">100%</span>
+                        </div>
+                        <div class="toggle-row">
+                            <span>🎚️ Compressor</span>
+                            <label class="toggle-switch" id="compressorToggle"><input type="checkbox"></label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>🛡️ Limiter</span>
+                            <label class="toggle-switch" id="limiterToggle"><input type="checkbox"></label>
+                        </div>
+                        <div class="toggle-row">
+                            <span>🔇 High-Pass Filter</span>
+                            <label class="toggle-switch" id="hpfToggle"><input type="checkbox"></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside>
+                <div class="upload-section" id="uploadSection">
+                    <div class="upload-icon">📁</div>
+                    <h3>Drop audio files here</h3>
+                    <p>MP3, WAV, OGG, FLAC supported</p>
+                    <button class="upload-btn" id="btnUpload">Choose Files</button>
+                    <input type="file" id="fileInput" accept="audio/*" multiple>
+                    <div class="file-info" id="fileInfo"></div>
+                </div>
+
+                <div class="panel track-info" id="trackInfo" style="display:none">
+                    <h3>Track Information</h3>
+                    <div class="info-grid">
+                        <span>File</span><span id="infoName">—</span>
+                        <span>Size</span><span id="infoSize">—</span>
+                        <span>Duration</span><span id="infoDuration">—</span>
+                        <span>Sample Rate</span><span id="infoSampleRate">—</span>
+                        <span>Channels</span><span id="infoChannels">—</span>
+                        <span>Bitrate</span><span id="infoBitrate">—</span>
+                    </div>
+                </div>
+
+                <div class="panel playlist-section" id="playlistSection" style="display:none">
+                    <div class="playlist-header">
+                        <h3>Playlist</h3>
+                        <span class="playlist-count" id="playlistCount">0 tracks</span>
+                    </div>
+                    <ul class="playlist" id="playlist"></ul>
+                </div>
+
+                <div class="actions-section">
+                    <button class="action-btn primary" id="btnExport">💾 Export to WAV</button>
+                    <button class="action-btn" id="btnClear">🗑 Clear Playlist</button>
+                </div>
+            </aside>
+        </div>
+
+        <div class="status ready" id="status">Ready — Load an audio file to begin enhancement</div>
+    </div>
+
+    <div class="drop-overlay" id="dropOverlay">
+        <h2>📁 Drop Audio Files</h2>
+        <p>Release to add to playlist</p>
+    </div>
+
+    <div class="modal" id="shortcutsModal">
+        <div class="modal-content">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="shortcuts-list">
+                <kbd>Space</kbd><span>Play / Pause</span>
+                <kbd>←</kbd><span>Seek back 5s</span>
+                <kbd>→</kbd><span>Seek forward 5s</span>
+                <kbd>↑</kbd><span>Volume +10%</span>
+                <kbd>↓</kbd><span>Volume -10%</span>
+                <kbd>M</kbd><span>Mute / Unmute</kbd>
+                    <kbd>A</kbd><span>A/B Bypass</span>
+                    <kbd>F</kbd><span>Fullscreen Visualizer</span>
+                    <kbd>1</kbd><span>Wired Earphones preset</span>
+                    <kbd>2</kbd><span>Bass Boost preset</span>
+                    <kbd>3</kbd><span>Vocal Clarity preset</span>
+                    <kbd>4</kbd><span>Flat preset</span>
+                    <kbd>L</kbd><span>Cycle Loop Mode</span>
+                    <kbd>S</kbd><span>Toggle Shuffle</span>
+                    <kbd>N</kbd><span>Next Track</span>
+                    <kbd>P</kbd><span>Previous Track</span>
+                    <kbd>Esc</kbd><span>Close / Exit Fullscreen</span>
+            </div>
+            <button class="close-modal" id="btnCloseShortcuts">Close</button>
+        </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h3>💾 Export Enhanced Audio</h3>
+            <p>Offline-render the current track with all active enhancements to a 16-bit WAV file.</p>
+            <div class="export-progress">
+                <div class="export-bar" id="exportBar"></div>
+            </div>
+            <div class="export-status" id="exportStatus">Ready to export</div>
+            <div class="modal-actions">
+                <button class="action-btn primary" id="btnStartExport">Start Export</button>
+                <button class="close-modal" id="btnCloseExport">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="audio-engine.js"></script>
+    <script src="visualizer.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- 3D Canvas Logic -->
+    <script>
+        function init3D(containerId, isVisualizer) {
+            const container = document.getElementById(containerId);
+            if (!container) return null;
+
+            const rect = container.parentElement === document.body ? { width: window.innerWidth, height: window.innerHeight } : container.parentElement.getBoundingClientRect();
+            let cWidth = rect.width || window.innerWidth;
+            let cHeight = rect.height || window.innerHeight;
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050505, isVisualizer ? 0.04 : 0.02);
+
+            const camera = new THREE.PerspectiveCamera(75, cWidth / cHeight, 0.1, 1000);
+            camera.position.z = isVisualizer ? 15 : 40;
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+            renderer.setSize(cWidth, cHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            const sceneGroup = new THREE.Group();
+            scene.add(sceneGroup);
+
+            // Particles
+            const particleCount = isVisualizer ? 1000 : 2000;
+            const particlesGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+
+            const colorNeon = new THREE.Color('#00f3ff');
+            const colorPurple = new THREE.Color('#9d4edd');
+            const colorBlue = new THREE.Color('#0077b6');
+
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                const r = (isVisualizer ? 15 : 25) * Math.cbrt(Math.random());
+                const theta = Math.random() * 2 * Math.PI;
+                const phi = Math.acos(2 * Math.random() - 1);
+
+                positions[i] = r * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+                positions[i + 2] = r * Math.cos(phi);
+
+                const rand = Math.random();
+                let mixedColor = colorNeon.clone();
+                if (rand > 0.66) mixedColor.lerp(colorPurple, Math.random());
+                else if (rand > 0.33) mixedColor.lerp(colorBlue, Math.random());
+
+                colors[i] = mixedColor.r;
+                colors[i + 1] = mixedColor.g;
+                colors[i + 2] = mixedColor.b;
+
+                sizes[i / 3] = Math.random() * 2;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            particlesGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const particleMaterial = new THREE.PointsMaterial({
+                size: isVisualizer ? 0.3 : 0.2,
+                vertexColors: true,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                opacity: 0.8,
+                depthWrite: false
+            });
+
+            const particleSystem = new THREE.Points(particlesGeometry, particleMaterial);
+            sceneGroup.add(particleSystem);
+
+            // Lighting for physical materials
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(5, 5, 10);
+            scene.add(directionalLight);
+
+            const pointLight = new THREE.PointLight(0x00f3ff, 2, 50);
+            pointLight.position.set(-5, -5, 5);
+            scene.add(pointLight);
+
+            // Core
+            const coreGeometry = new THREE.IcosahedronGeometry(isVisualizer ? 3 : 4, 1);
+            const coreSolidMaterial = new THREE.MeshBasicMaterial({ color: 0x050505, transparent: true, opacity: 0.9 });
+            const coreSolid = new THREE.Mesh(coreGeometry, coreSolidMaterial);
+
+            const coreWireMaterial = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+            const coreWire = new THREE.Mesh(coreGeometry, coreWireMaterial);
+
+            const innerGeometry = new THREE.OctahedronGeometry(isVisualizer ? 1.5 : 2, 0);
+            const innerMaterial = new THREE.MeshBasicMaterial({ color: 0x9d4edd, wireframe: true, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+            const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
+
+            const geometricCore = new THREE.Group();
+            geometricCore.add(coreSolid);
+            geometricCore.add(coreWire);
+            geometricCore.add(innerMesh);
+            sceneGroup.add(geometricCore);
+
+            // Liquid Ball (Ferrofluid)
+            let liquidMesh = null;
+            let liquidGeometry = null;
+            let liquidInitialPositions = null;
+
+            if (isVisualizer) {
+                // Higher detail geometry for smoother water surface
+                liquidGeometry = new THREE.IcosahedronGeometry(3.2, 24);
+                liquidInitialPositions = new Float32Array(liquidGeometry.attributes.position.array);
+                const liquidMaterial = new THREE.MeshPhysicalMaterial({
+                    color: 0x0099ff, // Real water blue
+                    emissive: 0x001133,
+                    metalness: 0.001, // Less metallic, more watery
+                    roughness: 0.00001, // Very smooth surface
+                    //transparent: true, 
+                    //opacity: 0.98, // Almost fully opaque
+                    wireframe: false
+                });
+                liquidMesh = new THREE.Mesh(liquidGeometry, liquidMaterial);
+                liquidMesh.visible = false; // Hidden by default
+                sceneGroup.add(liquidMesh);
+            }
+
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            let windowHalfX = cWidth / 2;
+            let windowHalfY = cHeight / 2;
+
+            if (!isVisualizer) {
+                document.addEventListener('mousemove', (event) => {
+                    mouseX = (event.clientX - windowHalfX) * 0.001;
+                    mouseY = (event.clientY - windowHalfY) * 0.001;
+                });
+            } else {
+                container.addEventListener('mousemove', (event) => {
+                    const crect = container.getBoundingClientRect();
+                    const cx = event.clientX - crect.left;
+                    const cy = event.clientY - crect.top;
+                    mouseX = (cx - windowHalfX) * 0.005;
+                    mouseY = (cy - windowHalfY) * 0.005;
+                });
+            }
+
+            window.addEventListener('resize', () => {
+                const nrect = container.parentElement === document.body ? { width: window.innerWidth, height: window.innerHeight } : container.parentElement.getBoundingClientRect();
+                cWidth = nrect.width;
+                cHeight = nrect.height;
+                windowHalfX = cWidth / 2;
+                windowHalfY = cHeight / 2;
+                camera.aspect = cWidth / cHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(cWidth, cHeight);
+            });
+
+            return {
+                renderer, scene, camera, sceneGroup, particleSystem, geometricCore, coreWire, innerMesh,
+                coreSolidMaterial, liquidMesh, liquidGeometry, liquidInitialPositions,
+                update: (time, bass, treble, mode) => {
+                    targetX = mouseX * 1.5;
+                    targetY = mouseY * 1.5;
+
+                    if (isVisualizer) {
+                        const isLiquid = mode === 3;
+
+                        if (liquidMesh) liquidMesh.visible = isLiquid;
+                        coreSolid.visible = !isLiquid;
+                        coreWire.visible = !isLiquid;
+                        innerMesh.visible = !isLiquid;
+
+                        if (isLiquid) {
+                            // Ferrofluid effect: manipulate vertices based on noise/audio
+                            const positions = liquidGeometry.attributes.position.array;
+                            for (let i = 0; i < positions.length; i += 3) {
+                                const ix = liquidInitialPositions[i];
+                                const iy = liquidInitialPositions[i + 1];
+                                const iz = liquidInitialPositions[i + 2];
+
+                                // Normalized vector
+                                const len = Math.sqrt(ix * ix + iy * iy + iz * iz);
+                                const nx = ix / len;
+                                const ny = iy / len;
+                                const nz = iz / len;
+
+                                // Smoother, flowing noise for a calming liquid effect
+                                const noise = Math.sin(nx * 3 + time * 1.5) * Math.cos(ny * 3 + time * 2) * Math.sin(nz * 3 + time * 1.2);
+
+                                // Expand smoothly based on bass and gentle noise
+                                const displacement = 1 + (noise * 0.15) + (noise * 0.4 * (bass - 1)) + ((bass - 1) * 0.3);
+
+                                positions[i] = ix * displacement;
+                                positions[i + 1] = iy * displacement;
+                                positions[i + 2] = iz * displacement;
+                            }
+                            liquidGeometry.attributes.position.needsUpdate = true;
+                            liquidGeometry.computeVertexNormals(); // Crucial for lighting to reflect off the moving waves
+                            liquidMesh.rotation.y = time * 0.2;
+                            liquidMesh.rotation.z = time * 0.1;
+                        }
+
+                        // Fast, audio-reactive movement
+                        particleSystem.rotation.y += 0.008 * treble;
+                        particleSystem.rotation.z += 0.004 * treble;
+                        geometricCore.rotation.x += 0.02 * treble;
+                        geometricCore.rotation.y += 0.03 * treble;
+                        geometricCore.scale.set(bass, bass, bass);
+                        innerMesh.rotation.x -= 0.04 * treble;
+                        innerMesh.rotation.y -= 0.02 * treble;
+                        coreWire.scale.setScalar(1 + Math.sin(time * 10) * 0.1 * bass);
+                    } else {
+                        // Slow, static background
+                        particleSystem.rotation.y = time * 0.05;
+                        particleSystem.rotation.z = time * 0.02;
+                        geometricCore.rotation.x = time * 0.1;
+                        geometricCore.rotation.y = time * 0.15;
+                        innerMesh.rotation.x = -time * 0.3;
+                        innerMesh.rotation.y = -time * 0.2;
+                        coreWire.scale.setScalar(1 + Math.sin(time * 3) * 0.03);
+                    }
+
+                    sceneGroup.rotation.x += 0.05 * (targetY - sceneGroup.rotation.x);
+                    sceneGroup.rotation.y += 0.05 * (targetX - sceneGroup.rotation.y);
+                    geometricCore.position.y = Math.sin(time * 2) * (isVisualizer ? 0.2 : 1.5);
+                    renderer.render(scene, camera);
+                }
+            };
+        }
+
+        const bgCtx = init3D('bg-canvas-container', false);
+        const visCtx = init3D('canvas-container', true);
+        const clock = new THREE.Clock();
+
+        function animateAll() {
+            requestAnimationFrame(animateAll);
+            const time = clock.getElapsedTime();
+
+            let bass = 1;
+            let treble = 1;
+            let mode = window.appState ? window.appState.visualizerMode : 0;
+
+            if (window.app && window.app.engine && window.app.engine.analyser) {
+                const analyser = window.app.engine.analyser;
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(dataArray);
+
+                let bassSum = 0;
+                for (let i = 0; i < 10; i++) bassSum += dataArray[i];
+                bass = 1 + (bassSum / 10 / 255) * 1.5;
+
+                let trebleSum = 0;
+                for (let i = 20; i < 40; i++) trebleSum += dataArray[i];
+                treble = 1 + (trebleSum / 20 / 255) * 5.0;
+            }
+
+            if (bgCtx) bgCtx.update(time, 1, 1, mode);
+            if (visCtx) visCtx.update(time, bass, treble, mode);
+        }
+        animateAll();
+
+        const btnThemeToggle = document.getElementById('btnThemeToggle');
+        if (btnThemeToggle) {
+            btnThemeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                const isLight = document.body.classList.contains('light-theme');
+                if (bgCtx) {
+                    bgCtx.scene.fog.color.setHex(isLight ? 0xf0f0f5 : 0x050505);
+                    bgCtx.coreSolidMaterial.color.setHex(isLight ? 0x0099cc : 0x050505);
+                }
+                if (visCtx) {
+                    visCtx.scene.fog.color.setHex(isLight ? 0xf0f0f5 : 0x050505);
+                    visCtx.coreSolidMaterial.color.setHex(isLight ? 0x0099cc : 0x050505);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
