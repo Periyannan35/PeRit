@@ -1,8 +1,8 @@
-# 🎵 SonicEnhance Pro
+# 🎵 PeRit (Perfect Ritardando) - Browser-Based Audio Enhancement Player
 
 **Professional Audio Enhancement for Wired Earphones (Android App)**
 
-SonicEnhance Pro is a high-performance audio enhancement application designed to improve clarity, bass balance, and spatial depth — optimized specifically for **wired earphones**.
+PeRit is a high-performance audio enhancement application designed to improve clarity, bass balance, and spatial depth — optimized specifically for **wired earphones**.
 
 ---
 
@@ -18,7 +18,7 @@ SonicEnhance Pro is a high-performance audio enhancement application designed to
 
 ## 🚀 Overview
 
-SonicEnhance Pro is built as a **closed Android application** with a custom audio processing pipeline.
+PeRit is built as a **closed Android application** with a custom audio processing pipeline.
 
 This repository only contains:
 
